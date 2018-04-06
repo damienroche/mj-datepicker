@@ -1,32 +1,43 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
+  <div @click="onClick" v-click-outside="hidePanel">
+    <input type="text">
+    <input type="text">
+    <date-picker-panel :showPanel="showPanel"></date-picker-panel>
   </div>
 </template>
 
 <script>
+
+import DatePickerPanel from './DatePicker/DatePickerPanel.vue'
+import ClickOutside from 'vue-click-outside'
+
 export default {
   name: 'DatePicker',
+  directives: {
+    ClickOutside
+  },
+  components: {
+    'date-picker-panel': DatePickerPanel
+  },
   props: {
-    msg: String
-  }
+  },
+  data() {
+    return {
+      showPanel: false
+    }
+  },
+  methods: {
+    onClick() {
+      this.$emit('click');
+      this.showPanel = true
+    },
+    hidePanel() {
+      this.showPanel = false
+    }
+  },
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+
 </style>
