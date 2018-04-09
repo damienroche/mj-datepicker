@@ -19,7 +19,7 @@ export class Month {
   }
 
   getDays() {
-    const range = moment.range(this.start, this.end)
+    const range = moment.range(this.start.startOf('week'), this.end.endOf('week'))
     const days = []
 
     for (let day of range.by('days'))

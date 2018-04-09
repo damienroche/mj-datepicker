@@ -1,6 +1,13 @@
 <template>
   <div>
-    <date-picker-month-picker groupBy="quarter"></date-picker-month-picker>
+    <date-picker-month-picker :grouped="true" groupBy="quarter" @selectize="updateSelected">
+      <div slot="group">
+        <div>Trim. 1</div>
+        <div>Trim. 2</div>
+        <div>Trim. 3</div>
+        <div>Trim. 4</div>
+      </div>
+    </date-picker-month-picker>
   </div>
 </template>
 
@@ -9,6 +16,11 @@
   export default {
     components: {
       'date-picker-month-picker': DatePickerMonthPicker
+    },
+    methods: {
+      updateSelected: function(start, end) {
+        this.$emit('selectize', start, end)
+      }
     }
   }
 </script>

@@ -24,6 +24,11 @@ storiesOf('DatePicker - initial states', module)
     template: '<date-picker paramsDateFrom="2018-04-06+12" paramsDateTo="2018-04-20+13" format="YYYY-MM-DD+HH" @click="action"></date-picker>',
     methods: { action: action('clicked') },
   }))
+  .add('Current Tab in params', () => ({
+    components: { DatePicker },
+    template: '<date-picker paramsDateFrom="2018-04-06+12" paramsDateTo="2018-04-20+13" format="YYYY-MM-DD+HH" paramsTabActive="week"></date-picker>',
+    methods: { action: action('clicked') },
+  }))
   // .add('Version Light', () => ({
   //   components: { DatePicker },
   //   template: '<date-picker placeholder="Séléctionnez une date" fullUi="false" @click="action"></date-picker>',

@@ -1,11 +1,10 @@
 <template>
   <div class="mj-calendar">
-
     <div class="mj-calendar-head">
       <div class="mj-calendar-head__controls">
-        <button @click="nextMonth()">next</button>
-        <div>{{month.getFormated()}}</div>
         <button @click="previousMonth()">prev</button>
+        <div>{{month.getFormated()}}</div>
+        <button @click="nextMonth()">next</button>
       </div>
     </div>
     <div class="mj-calendar-thead">
@@ -14,8 +13,19 @@
       </div>
     </div>
     <div class="mj-calendar-body">
-      <div class="mj-calendar-body__offset" :style="{width: (month.getWeekStart() * 14.2857) + '%'}"></div>
-      <div class="mj-calendar-body__day" v-for="day in month.getDays()" :class="{ 'is-current' : isSelected(day)}">
+      <!-- <div class="mj-calendar-body__offset" :style="{width: (month.getWeekStart() * 14.2857) + '%'}"></div> -->
+      <div class="mj-calendar-body__day"
+        v-for="(day, index) in days"
+        @mouseover="hoverize(day)"
+        @mouseleave="hover_range = null"
+        @click="selectize(day)"
+        :key="day.unix()"
+        :class="{
+          'is-current' : isCurrent(day),
+          'is-hoverable': isHoverable(day),
+          'is-selected' : isSelected(day),
+          'isnt-current-month': isAnotherMonth(day)
+        }">
         {{ day.format('DD') }}
       </div>
     </div>
@@ -25,8 +35,10 @@
 <script>
   import { DatePickerMixin } from './DatePickerMixin'
   import { Month } from './DatePickerClasses'
-  import moment from 'moment'
+  import Moment from 'moment'
+  import { extendMoment } from 'moment-range'
 
+  const moment = extendMoment(Moment)
   const current = moment()
 
   export default {
@@ -40,11 +52,24 @@
     data() {
       return {
         thead: this.translation('fr').days,
-        month: new Month(current.month(), current.year())
+        month: new Month(current.month(), current.year()),
+        current: null,
+        range: null,
+        hover_range: null,
+        selected_range: null,
+        selected: false,
+        start_date: null,
+        tmp_date: null,
+        end_date: null
+      }
+    },
+    computed: {
+      days: function() {
+        return this.month.getDays()
       }
     },
     methods: {
-      isSelected: function(day) {
+      isCurrent: function(day) {
         return day.isSame(new Date(), "day")
       },
       nextMonth: function() {
@@ -64,6 +89,85 @@
           year -= 1
         }
         this.month = new Month(month, year)
+      },
+      getWeekHoverRange(day) {
+        this.current = day.clone()
+        const start = day.clone().startOf('week')
+        const end = day.clone().endOf('week')
+        this.range = moment().range(start, end)
+        this.hover_range = []
+
+        for (let day of this.range.by('days')) {
+          this.hover_range.push(day)
+        }
+      },
+      // Need refacto
+      getWeekRange(day) {
+        this.current = day.clone()
+        const start = day.clone().startOf('week')
+        const end = day.clone().endOf('week')
+        this.range = moment().range(start, end)
+        this.selected_range = []
+
+        for (let day of this.range.by('days')) {
+          this.selected_range.push(day)
+        }
+      },
+      hoverize: function(day) {
+        if (this.selectBy == 'day') {
+          return
+        }
+
+        if (this.selectBy == 'week') {
+          this.getWeekHoverRange(day)
+        }
+      },
+      isHoverable: function(day) {
+        if (this.hover_range) {
+          for (var i = 0; i < this.hover_range.length; i++) {
+            if (this.hover_range[i].isSame(day, 'day')) return true
+          }
+        }
+        return false
+      },
+      selectize: function(day) {
+        if (this.selectBy == 'week') {
+          this.getWeekRange(day)
+          this.selected = true
+          this.start_date = day.clone().startOf('week')
+          this.end_date = day.clone().endOf('week')
+        }
+
+        if (this.selectBy == 'day') {
+          if (!this.tmp_date) {
+            this.tmp_date = day.clone()
+            if (this.start_date && this.end_date) {
+              this.start_date = null
+              this.end_date = null
+            }
+          } else if (!this.start_date && !this.end_date) {
+            if (this.tmp_date.isBefore(day)) {
+              this.start_date = this.tmp_date
+              this.end_date = day.clone()
+            } else {
+              this.start_date = day.clone()
+              this.end_date = this.tmp_date
+            }
+          }
+        }
+
+        this.$emit('selectize', this.start_date, this.end_date)
+      },
+      isSelected: function(day) {
+        if (this.selected_range && this.selected) {
+          for (var i = 0; i < this.selected_range.length; i++) {
+            if (this.selected_range[i].isSame(day, 'day')) return true
+          }
+        }
+        return false
+      },
+      isAnotherMonth: function(day) {
+        return !day.isSame(this.month, 'month')
       }
     }
   }
@@ -72,6 +176,12 @@
 <style lang="scss">
   .mj-calendar {
 
+  }
+
+  .mj-calendar-head__controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .mj-calendar-thead {
@@ -94,6 +204,21 @@
 
       &.is-current {
         text-decoration: underline;
+      }
+
+      &.is-hoverable {
+        &:not(.is-selected) {
+          cursor: pointer;
+          background-color: #ccc;
+        }
+      }
+
+      &.is-selected {
+        background-color: red;
+      }
+
+      &.isnt-current-month {
+        color: #696969;
       }
     }
   }

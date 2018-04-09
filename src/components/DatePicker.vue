@@ -14,6 +14,7 @@
     </date-picker-label>
     <date-picker-panel
       :showPanel="showPanel"
+      :activeTab="paramsTabActive"
       :fullUi="fullUi">
     </date-picker-panel>
   </div>
@@ -46,8 +47,9 @@ export default {
     paramsDateTo: {
       type: String
     },
-    rangeOfSelection: {
-      type: String
+    paramsTabActive: {
+      type: String,
+      default: 'range'
     },
     format: {
       type: String,

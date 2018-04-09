@@ -3,14 +3,19 @@
   <div v-show="true" class="mj-datepicker-panel">
     <div class="tabs" v-if="showFullUi === true">
       <button
-        v-for="tab in tabs"
-        v-bind:key="tab.name"
-        v-bind:class="['tab-button', { active: currentTab.name === tab.name }]"
-        v-on:click="currentTab = tab">
-        {{ tab.name }}
+        v-for="(tab, value, index) in tabs"
+        v-bind:key="value"
+        v-on:click="switchTab(value)">
+        {{ value }}
       </button>
     </div>
-    <component :is="currentTab.component"></component>
+
+    <component :is="currentTab.component" @selectize="updateSelected"></component>
+
+    <button type="submit" :disabled="!start_date || !end_date">OK</button>
+
+    {{ start_date_formatted }} - {{ end_date_formatted }}
+
   </div>
 </template>
 
@@ -21,28 +26,23 @@
   import DatePickerPanelQuarter from './DatePickerPanelQuarter'
   import DatePickerPanelYear from './DatePickerPanelYear'
 
-  const tabs = [
-    {
-      name: 'range',
+  const tabs = {
+    range: {
       component: DatePickerPanelRange
     },
-    {
-      name: 'week',
+    week: {
       component: DatePickerPanelWeek
     },
-    {
-      name: 'month',
+    month: {
       component: DatePickerPanelMonth
     },
-    {
-      name: 'quarter',
+    quarter: {
       component: DatePickerPanelQuarter
     },
-    {
-      name: 'year',
+    year: {
       component: DatePickerPanelYear
     }
-  ]
+  }
 
   export default {
     props: {
@@ -53,12 +53,17 @@
       fullUi: {
         format: Boolean,
         default: false
+      },
+      activeTab: {
+        format: String
       }
     },
     data() {
       return {
-        currentTab: tabs[0],
-        tabs: tabs
+        currentTab: tabs.range,
+        tabs: tabs,
+        start_date: null,
+        end_date: null
       }
     },
     computed: {
@@ -66,11 +71,30 @@
         return this.fullUi
       },
       currentTabComponent: function() {
+      },
+      start_date_formatted: function() {
+        if (this.start_date)
+          return this.start_date.format('DD MMMM YYYY')
+      },
+      end_date_formatted: function() {
+        if (this.end_date)
+          return this.end_date.format('DD MMMM YYYY')
       }
     },
     methods: {
+      updateSelected: function(start, end) {
+        this.start_date = start
+        this.end_date = end
+      },
+      switchTab: function(key) {
+        this.currentTab = tabs[key]
+        this.start_date = null
+        this.end_date = null
+      }
     },
     mounted: function() {
+      if (this.activeTab)
+        this.currentTab = tabs[this.activeTab]
     }
   }
 </script>

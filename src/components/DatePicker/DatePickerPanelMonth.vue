@@ -1,6 +1,6 @@
 <template>
   <div>
-    <date-picker-month-picker></date-picker-month-picker>
+    <date-picker-month-picker :grouped="false" @selectize="updateSelected"></date-picker-month-picker>
   </div>
 </template>
 
@@ -13,6 +13,11 @@
     props: {
       groupBy: {
         type: String
+      }
+    },
+    methods: {
+      updateSelected: function(start, end) {
+        this.$emit('selectize', start, end)
       }
     }
   }

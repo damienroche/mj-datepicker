@@ -1,6 +1,6 @@
 <template>
   <div>
-    <date-picker-calendar selectBy="week"></date-picker-calendar>
+    <date-picker-calendar selectBy="week" @selectize="updateSelected"></date-picker-calendar>
   </div>
 </template>
 
@@ -9,6 +9,11 @@
   export default {
     components: {
       'date-picker-calendar': DatePickerCalendar
+    },
+    methods: {
+      updateSelected: function(start, end) {
+        this.$emit('selectize', start, end)
+      }
     }
   }
 </script>
