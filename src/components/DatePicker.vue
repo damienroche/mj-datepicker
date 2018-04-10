@@ -15,7 +15,8 @@
     <date-picker-panel
       :showPanel="showPanel"
       :activeTab="paramsTabActive"
-      :fullUi="fullUi">
+      :fullUi="fullUi"
+      :begin="beginFormatted()">
     </date-picker-panel>
   </div>
 </template>
@@ -52,6 +53,13 @@ export default {
       default: 'range'
     },
     format: {
+      type: String,
+      default: 'YYYY-MM-DD+HH:mm'
+    },
+    begin: {
+      type: String
+    },
+    beginFormat: {
       type: String,
       default: 'YYYY-MM-DD+HH:mm'
     },
@@ -103,6 +111,7 @@ export default {
     onClick() {
       this.$emit('click');
       this.showPanel = true
+
     },
     hidePanel() {
       this.showPanel = false
@@ -113,12 +122,23 @@ export default {
      * @return {Void}
      */
     initField() {
+
       if (!this.presenceDates(this.paramsDateFrom, this.paramsDateTo)) return null
       const from = moment(this.paramsDateTo, this.format)
       const to = moment(this.paramsDateTo, this.format)
-      if (from.isValid() && to.isValid) {
+      if (from.isValid() && to.isValid()) {
         this.dateFrom = from
         this.dateTo = to
+      }
+
+    },
+
+    beginFormatted() {
+      if (this.begin) {
+        const begin = moment(this.begin, this.beginFormat)
+        if (begin.isValid()) {
+          return begin.clone()
+        }
       }
     }
   },

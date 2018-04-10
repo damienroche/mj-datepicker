@@ -10,9 +10,9 @@
       </button>
     </div>
 
-    <component :is="currentTab.component" @selectize="updateSelected"></component>
+    <component :is="currentTab.component" @selectize="updateSelected" :begin="begin"></component>
 
-    <button type="submit" :disabled="!start_date || !end_date">OK</button>
+    <button type="submit" :disabled="(!start_date || !end_date)">OK</button>
 
     {{ start_date_formatted }} - {{ end_date_formatted }}
 
@@ -56,6 +56,9 @@
       },
       activeTab: {
         format: String
+      },
+      begin: {
+        type: Object
       }
     },
     data() {
@@ -63,7 +66,8 @@
         currentTab: tabs.range,
         tabs: tabs,
         start_date: null,
-        end_date: null
+        end_date: null,
+        forever: false
       }
     },
     computed: {
@@ -74,11 +78,11 @@
       },
       start_date_formatted: function() {
         if (this.start_date)
-          return this.start_date.format('DD MMMM YYYY')
+          return this.start_date.format('HH:mm DD MMMM YYYY')
       },
       end_date_formatted: function() {
         if (this.end_date)
-          return this.end_date.format('DD MMMM YYYY')
+          return this.end_date.format('HH:mm DD MMMM YYYY')
       }
     },
     methods: {
