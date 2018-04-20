@@ -88,4 +88,11 @@ storiesOf('DatePicker - Options', module)
     methods: { action: action('clicked') },
   }))
 
+
+storiesOf('DatePicker - Themes', module)
+  .add('MJ-FLEET', () => ({
+      components: { DatePicker },
+      template: '<date-picker"></date-picker>'
+    }))
+
 /* eslint-enable react/react-in-jsx-scope */

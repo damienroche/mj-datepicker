@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mj-datepicker-panel-months">
     <date-picker-month-picker :grouped="false" @selectize="updateSelected"></date-picker-month-picker>
   </div>
 </template>
@@ -23,5 +23,8 @@
   }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
+  .mj-datepicker-panel-months {
+    padding: 20px;
+  }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mj-datepicker-panel-years">
     <date-picker-year-picker @selectize="updateSelected"></date-picker-year-picker>
   </div>
 </template>
@@ -18,5 +18,8 @@
   }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
+  .mj-datepicker-panel-years {
+    padding: 20px;
+  }
 </style>

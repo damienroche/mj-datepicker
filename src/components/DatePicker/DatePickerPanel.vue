@@ -1,21 +1,28 @@
 <template>
-  <!-- <div v-show="showPanel" class="mj-datepicker-panel"> -->
-  <div v-show="true" class="mj-datepicker-panel">
+  <div v-show="showPanel" class="mj-datepicker-panel">
+  <!-- <div v-show="true" class="mj-datepicker-panel"> -->
     <div class="tabs" v-if="showFullUi === true">
       <button
         v-for="(tab, value, index) in tabs"
-        v-bind:key="value"
-        v-on:click="switchTab(value)">
+        :key="value"
+        :class="{'is-selected': isSelected(tab)}"
+        @click="switchTab(value)">
         {{ value }}
       </button>
     </div>
 
-    <component :is="currentTab.component" @selectize="updateSelected" :begin="begin" :userRanges="ranges"></component>
+    <div>
+      <component :is="currentTab.component" @selectize="updateSelected" :begin="begin" :userRanges="ranges"></component>
+    </div>
 
-    <button type="cancel">Cancel</button>
-    <button type="submit" :disabled="(!start_date || !end_date)">OK</button>
+    <div class="mj-datepicker-panel-controls">
+      <button class="cancel-button transparent" type="cancel">Cancel</button>
+      <button class="submit-button success" type="submit" :disabled="(!start_date || !end_date)">OK</button>
+    </div>
 
-    {{ start_date_formatted }} - {{ end_date_formatted }}
+    <!-- <div>
+      {{ start_date_formatted }} - {{ end_date_formatted }}
+    </div> -->
 
   </div>
 </template>
@@ -97,6 +104,9 @@
         this.currentTab = tabs[key]
         this.start_date = null
         this.end_date = null
+      },
+      isSelected: function(tab) {
+        return this.currentTab === tab
       }
     },
     mounted: function() {
@@ -111,34 +121,64 @@
     position: absolute;
     left: 0;
     top: 100%;
-    background-color: #f8f8f8;
+    max-width: 390px;
+    width: 390px;
+    background: #FFF;
+    border: 1px solid #EEE;
+    box-shadow: 0 10px 30px 0 rgba(0,0,0,0.05);
+    border-radius: 2px;
+  }
+
+  .mj-datepicker-panel > div {
+    border-bottom: 1px solid #eee;
+
+    &:last-of-type {
+      border-bottom: 0;
+    }
+  }
+
+  .mj-datepicker-panel .tabs {
+    display: flex;
+    justify-content: space-between;
     padding: 20px;
   }
 
   .mj-datepicker-panel .tabs button {
+    background: #F6F7F9;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #3D4268;
+    letter-spacing: -0.3px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
   }
 
-  // .mj-datepicker-panel .tabs button {
-  //   border: none;
-  //   margin: 0;
-  //   padding: 0;
-  //   width: auto;
-  //   overflow: visible;
-  //   background: transparent;
-  //   cursor: pointer;
+  .mj-datepicker-panel .tabs button.is-selected,
+  .mj-datepicker-panel .tabs button:hover {
+    background: #3D4268;
+    color: #FFF;
+  }
 
-  //   /* inherit font & color from ancestor */
-  //   color: inherit;
-  //   font: inherit;
+  .mj-datepicker-panel-controls {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+  }
 
-  //   /* Normalize `line-height`. Cannot be changed from `normal` in Firefox 4+. */
-  //   line-height: normal;
+  .mj-datepicker-panel-controls .cancel-button,
+  .mj-datepicker-panel-controls .submit-button {
+    height: 40px;
+    font-size: 13px;
+  }
 
-  //   /* Corrects font smoothing for webkit */
-  //   -webkit-font-smoothing: inherit;
-  //   -moz-osx-font-smoothing: inherit;
+  .mj-datepicker-panel-controls .cancel-button {
+    color: #93A1BA;
+  }
 
-  //   /* Corrects inability to style clickable `input` types in iOS */
-  //   -webkit-appearance: none;
-  // }
+  .mj-datepicker-panel-controls .submit-button {
+    width: 130px;
+  }
 </style>

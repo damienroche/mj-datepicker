@@ -1,12 +1,13 @@
 <template>
   <div class="mj-datepicker" @click="onClick" v-click-outside="hidePanel" :class="classes">
     <div class="mj-datepicker__fields">
-      <input type="text" :value="dateFromFormatted" readonly="">
-      <input type="text" :value="dateToFormatted" readonly="">
+      <input type="hidden" :value="dateFromFormatted" readonly="">
+      <input type="hidden" :value="dateToFormatted" readonly="">
       <!-- <input type="text" :value="dateFrom.format(this.format)" readonly="">
       <input type="text" :value="dateTo.format(this.format)" readonly=""> -->
     </div>
     <date-picker-label
+      class="mj-datepicker-trigger"
       :placeholder="placeholder"
       :showLabelWithDates="initDates"
       :dateFrom="dateFromFormatted"
@@ -87,6 +88,10 @@ export default {
     ranges: {
       format: Array,
       default: null
+    },
+    theme: {
+      format: String,
+      default: "default"
     }
   },
   data() {
@@ -162,13 +167,60 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
   .mj-datepicker {
     position: relative;
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif;
 
     &:not(.panel-open) {
       cursor: pointer;
     }
+
+    button {
+      padding: 0 10px;
+      user-select: none;
+      width: auto;
+      border: 0;
+      overflow: visible;
+      cursor: pointer;
+      outline: 0;
+
+      /* Normalize `line-height`. Cannot be changed from `normal` in Firefox 4+. */
+      line-height: normal;
+
+      /* Corrects font smoothing for webkit */
+      -webkit-font-smoothing: inherit;
+      -moz-osx-font-smoothing: inherit;
+
+      /* Corrects inability to style clickable `input` types in iOS */
+      -webkit-appearance: none;
+    }
+
+    button.success {
+      background: #46C3A3;
+      border-radius: 4px;
+      color: white;
+
+      &:disabled {
+        cursor: not-allowed;
+        background-color: rgba(#46C3A3, 0.5);
+      }
+    }
+
+    button.transparent {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  .mj-datepicker-trigger {
+    height: 50px;
+    width: 50px;
+    border: 1px solid #EEE;
+    border-radius: 2px;
+    text-indent: -999px;
+    display: inline-block;
   }
 
 

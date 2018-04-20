@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mj-datepicker-panel-weeks">
     <date-picker-calendar selectBy="week" @selectize="updateSelected"></date-picker-calendar>
   </div>
 </template>
@@ -18,5 +18,8 @@
   }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
+  .mj-datepicker-panel-weeks {
+    padding: 20px;
+  }
 </style>

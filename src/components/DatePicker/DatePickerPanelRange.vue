@@ -1,9 +1,21 @@
 <template>
   <div class="mj-datepicker-panel-ranges">
-    <button v-for="range in ranges" @click="dispatch(range)" :class="{ 'is-selected': isSelected(range) }">
-      {{range}}
-    </button>
-    <date-picker-calendar selectBy="day" v-if="current == 'custom'" @selectize="updateSelected"></date-picker-calendar>
+    <div class="mj-datepicker-panel-ranges__controls">
+      <div class="range" v-for="range in ranges" @click="dispatch(range)" :class="{ 'is-selected': isSelected(range) }">
+        {{range}}
+      </div>
+    </div>
+    <div>
+      <div class="mj-datepicker-panel-ranges__result">
+        <span class="label">Date de début et de fin :</span>
+        <div class="dates">
+          <span class="icon"></span>
+          <span class="date">{{ start_date_formatted }} - {{ end_date_formatted }}</span>
+        </div>
+      </div>
+      </label>
+      <date-picker-calendar selectBy="day" v-if="current == 'custom'" @selectize="updateSelected" style="margin-top: 30px;"></date-picker-calendar>
+    </div>
   </div>
 </template>
 
@@ -13,20 +25,30 @@
   import moment from 'moment'
   import _ from 'lodash'
 
+  // const ranges = [
+  //   'yesterday',
+  //   'today',
+  //   'this-week',
+  //   'this-month',
+  //   'this-quarter',
+  //   'this-year',
+  //   'last-week',
+  //   'last-month',
+  //   'last-quarter',
+  //   'last-year',
+  //   'past-30-days',
+  //   'past-90-days',
+  //   'past-6-months',
+  //   'past-year',
+  //   'custom'
+  // ]
+
   const ranges = [
     'yesterday',
     'today',
-    'this-week',
-    'this-month',
-    'this-quarter',
-    'this-year',
     'last-week',
-    'last-month',
-    'last-quarter',
-    'last-year',
     'past-30-days',
     'past-90-days',
-    'past-6-months',
     'past-year',
     'custom'
   ]
@@ -54,6 +76,20 @@
     computed: {
       ranges() {
         return this.userRanges || ranges
+      },
+      end_date_formatted() {
+        if (this.end_date) {
+          return this.end_date.format('DD/MM/YYYY')
+        } else {
+          return ""
+        }
+      },
+      start_date_formatted() {
+        if (this.start_date) {
+          return this.start_date.format('DD/MM/YYYY')
+        } else {
+          return ""
+        }
       }
     },
     methods: {
@@ -135,6 +171,8 @@
         return this.current === range
       },
       updateSelected: function(start, end) {
+        this.start_date = start
+        this.end_date = end
         this.$emit('selectize', start, end)
       },
     },
@@ -148,7 +186,69 @@
 </script>
 
 <style scoped lang="scss">
-  button.is-selected {
-    background-color: red
+  .mj-datepicker-panel-ranges {
+    > div {
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+
+      &:last-of-type {
+        border-bottom: 0;
+      }
+    }
+  }
+
+  .mj-datepicker-panel-ranges__controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mj-datepicker-panel-ranges__result {
+    .label {
+      font-size: 13px;
+      color: #3D4268;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .dates {
+      display: flex;
+      height: 50px;
+      border: 1px solid #EEE;
+
+      .icon {
+        border-right: 1px solid #EEE;
+        display: inline-flex;
+        height: 50px;
+        width: 50px;
+      }
+
+      .date {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 50px;
+        flex: 1;
+        font-size: 14px;
+        color: #3D4268;
+      }
+    }
+  }
+
+  .mj-datepicker-panel-ranges .range {
+    color: #3D4268;
+    display: inline-flex;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 5px 0;
+    font-size: 13px;
+
+    &::before {
+      content: '-';
+      margin-right: 25px;
+    }
+
+    &:hover, &.is-selected {
+      color: #46C3A3;
+    }
   }
 </style>

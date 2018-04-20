@@ -1,5 +1,5 @@
 <template>
-  <div class="mj-calendar">
+  <div class="mj-calendar" :class="selectBy">
     <div class="mj-calendar-head">
       <div class="mj-calendar-head__controls">
         <button @click="previousMonth()">prev</button>
@@ -12,7 +12,7 @@
         {{item}}
       </div>
     </div>
-    <div class="mj-calendar-body">
+    <div class="mj-calendar-body" :class="{'with-selected-range': isSelectedRange}">
       <div class="mj-calendar-body__day"
         v-for="(day, index) in days"
         @mouseover="hoverize(day)"
@@ -68,6 +68,9 @@
     computed: {
       days: function() {
         return this.month.getDays()
+      },
+      isSelectedRange: function() {
+        return this.start_date && this.end_date
       }
     },
     methods: {
@@ -212,18 +215,29 @@
 
 <style lang="scss">
   .mj-calendar {
-
   }
 
   .mj-calendar-head__controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-size: 14px;
+    color: #3D4268;
+    letter-spacing: 0;
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 15px;
   }
 
   .mj-calendar-thead {
     display: flex;
     flex-wrap: wrap;
+    font-size: 11px;
+    color: #93A1BA;
+    letter-spacing: -0.2px;
+    text-align: center;
+    line-height: 19.01px;
+    margin-bottom: 10px;
 
     &__label {
       width: 14.2857%;
@@ -238,39 +252,111 @@
     &__day {
       width: 14.2857%;
       text-align: center;
+      font-size: 13px;
+      color: #8F92AE;
+      text-align: center;
+      position: relative;
+      padding: 12px 0;
+      border-bottom: 1px solid white;
+      border-top: 1px solid white;
+      z-index: 2;
+      cursor: pointer;
+
+      &::before {
+        content: '';
+        position: absolute;
+        height: 34px;
+        width: 34px;
+        top: 50%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%);
+        z-index: -1;
+      }
 
       &.is-current {
-        text-decoration: underline;
+        color: white;
+
+        &::before {
+          border-radius: 100%;
+          background: #3D4268;
+        }
       }
 
       &.isnt-allowed {
         cursor: not-allowed;
       }
 
-      &.is-hoverable {
-        &:not(.is-delimiter),
-        &:not(.is-selected) {
-          cursor: pointer;
-          background-color: #ccc;
 
-          &:last-of-type {
-            border-radius: 20px;
-          }
-        }
-
-      }
-
-      &.is-selected {
-        background-color: red;
-      }
 
       &.isnt-current-month {
-        color: #696969;
-      }
-
-      &.is-delimiter {
-        background-color: green !important;
+        color: rgba(#8F92AE, 0.5);
       }
     }
   }
+
+  .mj-calendar.week .mj-calendar-body .mj-calendar-body__day {
+    &.is-hoverable {
+      &:not(.is-selected) {
+        background-color: #F6F7F9;
+      }
+    }
+
+    &.is-selected {
+      color: white;
+      background-color: #46C3A3;
+    }
+  }
+
+  .mj-calendar.day .mj-calendar-body .mj-calendar-body__day {
+    &:hover {
+      color: #3D4268;
+
+      &::before {
+        border: 2px solid #E6EAF1;
+        background-color: transparent;
+        border-radius: 100%;
+      }
+    }
+
+    &.is-hoverable.is-current {
+      &:hover {
+        &::before {
+          background: #3D4268;
+        }
+      }
+    }
+  }
+
+  .mj-calendar.day .mj-calendar-body .mj-calendar-body__day.is-selected,
+  .mj-calendar.day .mj-calendar-body .mj-calendar-body__day.is-hoverable,
+  .mj-calendar.day .mj-calendar-body .mj-calendar-body__day.is-delimiter {
+    color: white;
+    background-color: #46C3A3;
+  }
+
+  .mj-calendar.day .mj-calendar-body .mj-calendar-body__day.is-hoverable {
+    &::before {
+      border-color: transparent;
+    }
+  }
+
+  .mj-calendar .mj-calendar-body.with-selected-range {
+    .mj-calendar-body__day.is-delimiter {
+      border-radius: 6px;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .mj-calendar-body__day.is-selected + .is-selected.is-delimiter {
+      border-radius: 6px;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+
+  // .mj-calendar.day .mj-calendar-body .mj-calendar-body__day.is-delimiter.is-selected,
+  // .mj-calendar.day .mj-calendar-body .mj-calendar-body__day.is-hoverable.is-delimiter {
+  //   background-color: transparent;
+  // }
+
 </style>
