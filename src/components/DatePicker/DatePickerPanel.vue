@@ -10,8 +10,9 @@
       </button>
     </div>
 
-    <component :is="currentTab.component" @selectize="updateSelected" :begin="begin"></component>
+    <component :is="currentTab.component" @selectize="updateSelected" :begin="begin" :userRanges="ranges"></component>
 
+    <button type="cancel">Cancel</button>
     <button type="submit" :disabled="(!start_date || !end_date)">OK</button>
 
     {{ start_date_formatted }} - {{ end_date_formatted }}
@@ -59,6 +60,10 @@
       },
       begin: {
         type: Object
+      },
+      ranges: {
+        type: Array,
+        default: null
       }
     },
     data() {
@@ -73,8 +78,6 @@
     computed: {
       showFullUi: function() {
         return this.fullUi
-      },
-      currentTabComponent: function() {
       },
       start_date_formatted: function() {
         if (this.start_date)
@@ -109,5 +112,33 @@
     left: 0;
     top: 100%;
     background-color: #f8f8f8;
+    padding: 20px;
   }
+
+  .mj-datepicker-panel .tabs button {
+  }
+
+  // .mj-datepicker-panel .tabs button {
+  //   border: none;
+  //   margin: 0;
+  //   padding: 0;
+  //   width: auto;
+  //   overflow: visible;
+  //   background: transparent;
+  //   cursor: pointer;
+
+  //   /* inherit font & color from ancestor */
+  //   color: inherit;
+  //   font: inherit;
+
+  //   /* Normalize `line-height`. Cannot be changed from `normal` in Firefox 4+. */
+  //   line-height: normal;
+
+  //   /* Corrects font smoothing for webkit */
+  //   -webkit-font-smoothing: inherit;
+  //   -moz-osx-font-smoothing: inherit;
+
+  //   /* Corrects inability to style clickable `input` types in iOS */
+  //   -webkit-appearance: none;
+  // }
 </style>

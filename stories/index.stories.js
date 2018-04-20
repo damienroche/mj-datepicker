@@ -75,6 +75,7 @@ storiesOf('DatePicker - initial states', module)
   //   methods: { action: action('clicked') },
   // }))
 
+
 storiesOf('DatePicker - Options', module)
   .add('With placeholder', () => ({
       components: { DatePicker },

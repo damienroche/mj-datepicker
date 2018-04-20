@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="mj-datepicker-panel-ranges">
     <button v-for="range in ranges" @click="dispatch(range)" :class="{ 'is-selected': isSelected(range) }">
-      {{range.type}}
+      {{range}}
     </button>
     <date-picker-calendar selectBy="day" v-if="current == 'custom'" @selectize="updateSelected"></date-picker-calendar>
   </div>
@@ -9,9 +9,27 @@
 
 <script>
   import DatePickerCalendar from './DatePickerCalendar'
-  import { ranges } from './DatePickerRanges'
+  // import { ranges } from './DatePickerRanges'
   import moment from 'moment'
   import _ from 'lodash'
+
+  const ranges = [
+    'yesterday',
+    'today',
+    'this-week',
+    'this-month',
+    'this-quarter',
+    'this-year',
+    'last-week',
+    'last-month',
+    'last-quarter',
+    'last-year',
+    'past-30-days',
+    'past-90-days',
+    'past-6-months',
+    'past-year',
+    'custom'
+  ]
 
   export default {
     components: {
@@ -20,23 +38,29 @@
     props: {
       begin: {
         type: Object
+      },
+      userRanges: {
+        type: Array,
+        default: null
       }
     },
     data() {
       return {
-        ranges: ranges,
         start_date: null,
         end_date: null,
         current: null
       }
     },
-    // computed: {
-    // },
+    computed: {
+      ranges() {
+        return this.userRanges || ranges
+      }
+    },
     methods: {
       dispatch: function(range) {
-        this.current = range.type
+        this.current = range
 
-        switch(range.type) {
+        switch(range) {
           case 'yesterday' :
             this.start_date = moment().add(-1, 'days').startOf('days')
             this.end_date = moment().add(-1, 'days').endOf('days')
@@ -103,21 +127,21 @@
           case 'custom' :
             this.start_date = null
             this.end_date = null
-          default:
-            console.log(range.type)
         }
+
         this.$emit('selectize', this.start_date, this.end_date)
       },
       isSelected: function(range) {
-        return this.current == range.type
+        return this.current === range
       },
       updateSelected: function(start, end) {
         this.$emit('selectize', start, end)
       },
     },
     mounted() {
-      if (!this.begin)
-        this.ranges = _.omit(this.ranges, 'forever')
+      if (this.begin)
+        this.ranges.push('forever')
+      console.log(this.userRanges)
     }
   }
 

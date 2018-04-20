@@ -16,7 +16,8 @@
       :showPanel="showPanel"
       :activeTab="paramsTabActive"
       :fullUi="fullUi"
-      :begin="beginFormatted()">
+      :begin="beginFormatted()"
+      :ranges="ranges">
     </date-picker-panel>
   </div>
 </template>
@@ -74,6 +75,18 @@ export default {
     fullUi: {
       format: Boolean,
       default: true
+    },
+    disallowFuture: {
+      format: Boolean,
+      default: true
+    },
+    disallowPast: {
+      format: Boolean,
+      default: false
+    },
+    ranges: {
+      format: Array,
+      default: null
     }
   },
   data() {

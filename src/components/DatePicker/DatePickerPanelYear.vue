@@ -1,6 +1,6 @@
 <template>
   <div>
-    <date-picker-year-picker></date-picker-year-picker>
+    <date-picker-year-picker @selectize="updateSelected"></date-picker-year-picker>
   </div>
 </template>
 
@@ -9,6 +9,11 @@
   export default {
     components: {
       'date-picker-year-picker': DatePickerYearPicker
+    },
+    methods: {
+      updateSelected: function(start, end) {
+        this.$emit('selectize', start, end)
+      }
     }
   }
 </script>

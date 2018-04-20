@@ -13,17 +13,18 @@
       </div>
     </div>
     <div class="mj-calendar-body">
-      <!-- <div class="mj-calendar-body__offset" :style="{width: (month.getWeekStart() * 14.2857) + '%'}"></div> -->
       <div class="mj-calendar-body__day"
         v-for="(day, index) in days"
         @mouseover="hoverize(day)"
-        @mouseleave="hover_range = null"
+        @mouseleave="hover_range = []"
         @click="selectize(day)"
         :key="day.unix()"
         :class="{
           'is-current' : isCurrent(day),
           'is-hoverable': isHoverable(day),
           'is-selected' : isSelected(day),
+          'isnt-allowed': false,
+          'is-delimiter': isDelimiter(day),
           'isnt-current-month': isAnotherMonth(day)
         }">
         {{ day.format('DD') }}
@@ -46,7 +47,7 @@
     props: {
       selectBy: {
         type: String,
-        default: 'day'
+        default: "day"
       }
     },
     data() {
@@ -55,8 +56,9 @@
         month: new Month(current.month(), current.year()),
         current: null,
         range: null,
-        hover_range: null,
-        selected_range: null,
+        hover_range: [],
+        selected_range: [],
+        delimiters: [],
         selected: false,
         start_date: null,
         tmp_date: null,
@@ -92,8 +94,8 @@
       },
       getWeekHoverRange(day) {
         this.current = day.clone()
-        const start = day.clone().startOf('week')
-        const end = day.clone().endOf('week')
+        const start = day.clone().startOf("week")
+        const end = day.clone().endOf("week")
         this.range = moment().range(start, end)
         this.hover_range = []
 
@@ -104,41 +106,63 @@
       // Need refacto
       getWeekRange(day) {
         this.current = day.clone()
-        const start = day.clone().startOf('week')
-        const end = day.clone().endOf('week')
+        const start = day.clone().startOf("week")
+        const end = day.clone().endOf("week")
         this.range = moment().range(start, end)
         this.selected_range = []
 
-        for (let day of this.range.by('days')) {
+        for (let day of this.range.by("days")) {
           this.selected_range.push(day)
         }
       },
       hoverize: function(day) {
-        if (this.selectBy == 'day') {
-          return
+        if (this.selectBy === "day") {
+          const c = day.clone()
+          if (this.tmp_date) {
+            if (c.isBefore(this.tmp_date)) {
+              this.range = moment().range(c, this.tmp_date)
+            } else {
+              this.range = moment().range(this.tmp_date, c)
+            }
+            this.hover_range = []
+            for (let day of this.range.by("days")) {
+              this.hover_range.push(day)
+            }
+          }
         }
 
-        if (this.selectBy == 'week') {
+        if (this.selectBy === "week") {
           this.getWeekHoverRange(day)
         }
       },
       isHoverable: function(day) {
-        if (this.hover_range) {
+        if (this.selectBy === "day" && this.tmp_date && !this.end_date) {
           for (var i = 0; i < this.hover_range.length; i++) {
-            if (this.hover_range[i].isSame(day, 'day')) return true
+            if (this.hover_range[i].isSame(day, "day")) return true
+          }
+        }
+        if (this.selectBy === "week") {
+          for (var i = 0; i < this.hover_range.length; i++) {
+            if (this.hover_range[i].isSame(day, "day")) return true
           }
         }
         return false
       },
       selectize: function(day) {
-        if (this.selectBy == 'week') {
+        if (this.selectBy === "week") {
           this.getWeekRange(day)
           this.selected = true
-          this.start_date = day.clone().startOf('week')
-          this.end_date = day.clone().endOf('week')
+          this.start_date = day.clone().startOf("week")
+          this.end_date = day.clone().endOf("week")
+          this.delimiters = [this.end_date, this.start_date]
         }
 
-        if (this.selectBy == 'day') {
+        if (this.selectBy === "day") {
+          this.selected_range = []
+          if (this.start_date && this.end_date) {
+            this.delimiters = []
+          }
+          this.delimiters.push(day.clone())
           if (!this.tmp_date) {
             this.tmp_date = day.clone()
             if (this.start_date && this.end_date) {
@@ -153,6 +177,13 @@
               this.start_date = day.clone()
               this.end_date = this.tmp_date
             }
+            this.range = moment().range(this.start_date, this.end_date)
+            this.selected_range = []
+            for (let day of this.range.by("days")) {
+              this.selected_range.push(day)
+            }
+            this.selected = true
+            this.tmp_date = null
           }
         }
 
@@ -161,8 +192,14 @@
       isSelected: function(day) {
         if (this.selected_range && this.selected) {
           for (var i = 0; i < this.selected_range.length; i++) {
-            if (this.selected_range[i].isSame(day, 'day')) return true
+            if (this.selected_range[i].isSame(day, "day")) return true
           }
+        }
+        return false
+      },
+      isDelimiter: function(day) {
+        for (var i = 0; i < this.delimiters.length; i++) {
+          if (day.isSame(this.delimiters[i], "day")) return true
         }
         return false
       },
@@ -206,11 +243,21 @@
         text-decoration: underline;
       }
 
+      &.isnt-allowed {
+        cursor: not-allowed;
+      }
+
       &.is-hoverable {
+        &:not(.is-delimiter),
         &:not(.is-selected) {
           cursor: pointer;
           background-color: #ccc;
+
+          &:last-of-type {
+            border-radius: 20px;
+          }
         }
+
       }
 
       &.is-selected {
@@ -219,6 +266,10 @@
 
       &.isnt-current-month {
         color: #696969;
+      }
+
+      &.is-delimiter {
+        background-color: green !important;
       }
     }
   }
